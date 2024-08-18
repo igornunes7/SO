@@ -143,7 +143,7 @@ void *removerPares(void *param) {
                 sem_post(sem2);
             }
         }
-        //garante que lista1 nao seja mudada por outra thread enquanto está em andamento
+        //garante que lista1 irá ter um nó antes de ser acessada
         sem_wait(sem1);
         ptr1 = ptr1->prox;
 
@@ -191,7 +191,7 @@ void *removerPrimos(void *param) {
                 sem_post(sem3);
             }
         }
-        //garante que lista2 nao seja mudada por outra thread enquanto está em andamento
+        //garante que lista2 irá ter um nó antes de ser acessada
         sem_wait(sem2);
         ptr2 = ptr2->prox;
 
