@@ -47,9 +47,9 @@ void inserirFim(s_no **ptlista, int x) {
         ptr = ptr->prox;
     }
 
-    pthread_mutex_lock(&ptr->lock);
+    pthread_mutex_lock(&novo->lock);
     ptr->prox = novo;
-    pthread_mutex_unlock(&ptr->lock);
+    pthread_mutex_unlock(&novo->lock);
 }
 
 bool isPrimo(int n) {
@@ -101,7 +101,7 @@ void *removerPares(void *param) {
             pthread_mutex_destroy(&temp->lock);
             free(temp);
 
-            
+
         } else {
             pthread_mutex_unlock(&ptr1->lock);
             aux = ptr1;
