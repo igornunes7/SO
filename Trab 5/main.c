@@ -94,8 +94,8 @@ void *removerPares(void *param) {
 
     }
 
-    s_no *ptr1 = ptlista1->prox;
-    s_no *aux = ptlista1;
+    s_no *ptr1 = ptlista1;
+    s_no *aux = NULL;
 
     while (ptr1->num != -1) {
         pthread_mutex_lock(&ptr1->lock);
