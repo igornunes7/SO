@@ -11,8 +11,11 @@ struct s_no {
 
 typedef struct s_no s_no;
 
+
 s_no *ptlista1 = NULL;
 pthread_mutex_t lock;
+
+
 
 void *removerPares(void *param);
 void *removerPrimos(void *param);
@@ -74,6 +77,8 @@ void desalocarLista(s_no *ptlista) {
     s_no *ptr1 = ptlista;
     s_no *aux;
 
+
+
     while (ptr1 != NULL) {
         aux = ptr1->prox;
         pthread_mutex_destroy(&ptr1->lock);
@@ -83,28 +88,33 @@ void desalocarLista(s_no *ptlista) {
     ptlista = NULL;
 }
 
+
 void *removerPares(void *param) {
+    while (ptlista1->prox == NULL) {
+
+    }
+
     s_no *ptr1 = ptlista1->prox;
-    s_no *aux = NULL;
+    s_no *aux = ptlista1;
 
     while (ptr1->num != -1) {
         pthread_mutex_lock(&ptr1->lock);
         if (ptr1->num % 2 == 0 && ptr1->num > 2) {
-            if (aux == NULL) {
-                ptlista1->prox = ptr1->prox;
-            } else {
-                aux->prox = ptr1->prox;
-            }
             s_no *temp = ptr1;
+            if (aux == ptlista1) {
+                aux->prox = NULL;
+                ptr1 = ptlista1;
+            } else {
+                aux->prox = NULL;
+                ptr1 = aux;
+            }
             pthread_mutex_unlock(&ptr1->lock);
             ptr1 = ptr1->prox;
             pthread_mutex_destroy(&temp->lock);
             free(temp);
-
-
         } else {
             pthread_mutex_unlock(&ptr1->lock);
-            aux = ptr1;
+            aux = aux->prox;
             ptr1 = ptr1->prox;
         }
     }
@@ -112,8 +122,10 @@ void *removerPares(void *param) {
     pthread_exit(0);
 }
 
+
+/*
 void *removerPrimos(void *param) {
-    s_no *ptr1 = ptlista1->prox;
+    s_no *ptr1 = ptlista1;
     s_no *aux = NULL;
 
     while (ptr1 != NULL) {
@@ -139,14 +151,17 @@ void *removerPrimos(void *param) {
     pthread_exit(0);
 }
 
+*/
+
 void *imprimirPrimos(void *param) {
+    while (ptlista1->prox == NULL) {
+        
+    }
     s_no *ptr1 = ptlista1->prox;
 
     printf("Lista1: ");
     while (ptr1->num != -1) {
-        pthread_mutex_lock(&ptr1->lock);
         printf("%d ", ptr1->num);
-        pthread_mutex_unlock(&ptr1->lock);
         ptr1 = ptr1->prox;
     }
 
@@ -164,7 +179,7 @@ int main(int argc, char **argv) {
 
     FILE *arq;
 
-    pthread_attr_t attr1, attr2, attr3;
+    pthread_attr_t attr1, attr2;
     pthread_t tid[2];
     s_no *ptr = NULL;
 
@@ -184,9 +199,9 @@ int main(int argc, char **argv) {
 
     inicializaPt(&ptlista1);
 
-
     pthread_create(&tid[0], &attr1, removerPares, NULL);
     pthread_create(&tid[1], &attr2, imprimirPrimos, NULL);
+
 
     while (fscanf(arq, "%d", &valor) != EOF) {
         inserirFim(&ptlista1, valor);
@@ -199,7 +214,7 @@ int main(int argc, char **argv) {
         pthread_join(tid[i], NULL);
     }
 
-    // desalocarLista(ptlista1);
+    desalocarLista(ptlista1);
 
     return 0;
 }
