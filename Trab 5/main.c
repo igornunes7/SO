@@ -169,6 +169,7 @@ int main(int argc, char **argv) {
 
     while (fscanf(arq, "%d", &valor) != EOF) {
         s_no *novo = (s_no *)malloc(sizeof(s_no));
+        s_no *ptr = ptlista1;
         novo->num = valor;
         novo->prox = NULL;
         pthread_mutex_init(&novo->lock, NULL);
@@ -178,16 +179,21 @@ int main(int argc, char **argv) {
             ptlista1_fim = novo;
             pthread_mutex_lock(&novo->lock);
         } else {
-            s_no *ptr = ptlista1;
             ptlista1_fim->prox = novo;
             ptlista1_fim = novo;
-            pthread_mutex_lock(&ptlista1_fim->lock);
+            pthread_mutex_lock(&novo->lock);
             pthread_mutex_unlock(&ptr->lock);
+            ptr = ptr->prox;
         }
 
     }
 
-    //inserirFim(&ptlista1, -1); 
+    s_no *ultimo = (s_no *)malloc(sizeof(s_no));
+    s_no *ptr = ptlista1;
+    ultimo->num = -1;
+    ultimo->prox = NULL;
+    ptlista1_fim->prox = ultimo;
+    ptlista1_fim = ultimo;
     fclose(arq);
 
     for (int i = 0; i < 2; i++) {
