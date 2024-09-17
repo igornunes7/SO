@@ -11,49 +11,14 @@ struct s_no {
 
 typedef struct s_no s_no;
 
-
 s_no *ptlista1 = NULL;
+s_no *ptlista1_fim = NULL;
 pthread_mutex_t lock;
-
-
 
 void *removerPares(void *param);
 void *removerPrimos(void *param);
 void *imprimirPrimos(void *param);
 
-void inicializaPt(s_no **ptlista) {
-    if ((ptlista != NULL) && (*ptlista == NULL)) {
-        *ptlista = malloc(sizeof(s_no));
-        if (*ptlista != NULL) {
-            (*ptlista)->prox = NULL;
-            (*ptlista)->num = -99;
-            pthread_mutex_init(&(*ptlista)->lock, NULL);
-        } else {
-            fprintf(stderr, "Erro na alocacao do no cabeca.\n");
-            exit(-1);
-        }
-    } else {
-        fprintf(stderr, "Erro no ponteiro ptlista\n");
-        exit(-1);
-    }
-}
-
-void inserirFim(s_no **ptlista, int x) {
-    s_no *novo = malloc(sizeof(s_no));
-    novo->num = x;
-    novo->prox = NULL;
-    pthread_mutex_init(&novo->lock, NULL);
-
-    s_no *ptr = *ptlista;
-
-    while (ptr->prox != NULL) {
-        ptr = ptr->prox;
-    }
-
-    pthread_mutex_lock(&novo->lock);
-    ptr->prox = novo;
-    pthread_mutex_unlock(&novo->lock);
-}
 
 bool isPrimo(int n) {
     if (n <= 1) {
@@ -197,17 +162,32 @@ int main(int argc, char **argv) {
         exit(-1);
     }
 
-    inicializaPt(&ptlista1);
 
     pthread_create(&tid[0], &attr1, removerPares, NULL);
     pthread_create(&tid[1], &attr2, imprimirPrimos, NULL);
 
 
     while (fscanf(arq, "%d", &valor) != EOF) {
-        inserirFim(&ptlista1, valor);
+        s_no *novo = (s_no *)malloc(sizeof(s_no));
+        novo->num = valor;
+        novo->prox = NULL;
+        pthread_mutex_init(&novo->lock, NULL);
+
+        if (ptlista1 == NULL) {
+            ptlista1 = novo;
+            ptlista1_fim = novo;
+            pthread_mutex_lock(&novo->lock);
+        } else {
+            s_no *ptr = ptlista1;
+            ptlista1_fim->prox = novo;
+            ptlista1_fim = novo;
+            pthread_mutex_lock(&ptlista1_fim->lock);
+            pthread_mutex_unlock(&ptr->lock);
+        }
+
     }
 
-    inserirFim(&ptlista1, -1); 
+    //inserirFim(&ptlista1, -1); 
     fclose(arq);
 
     for (int i = 0; i < 2; i++) {
