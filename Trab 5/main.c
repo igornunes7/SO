@@ -41,9 +41,6 @@ bool isPrimo(int n) {
 void desalocarLista(s_no *ptlista) {
     s_no *ptr1 = ptlista;
     s_no *aux;
-
-
-
     while (ptr1 != NULL) {
         aux = ptr1->prox;
         pthread_mutex_destroy(&ptr1->lock);
@@ -55,10 +52,6 @@ void desalocarLista(s_no *ptlista) {
 
 
 void *removerPares(void *param) {
-    while (ptlista1->prox == NULL) {
-
-    }
-
     s_no *ptr1 = ptlista1;
     s_no *aux = NULL;
 
@@ -146,7 +139,6 @@ int main(int argc, char **argv) {
 
     pthread_attr_t attr1, attr2;
     pthread_t tid[2];
-    s_no *ptr = NULL;
 
     pthread_attr_init(&attr1);
     pthread_attr_init(&attr2);
@@ -166,7 +158,7 @@ int main(int argc, char **argv) {
     pthread_create(&tid[0], &attr1, removerPares, NULL);
     pthread_create(&tid[1], &attr2, imprimirPrimos, NULL);
 
-
+    
     while (fscanf(arq, "%d", &valor) != EOF) {
         s_no *novo = (s_no *)malloc(sizeof(s_no));
         s_no *ptr = ptlista1;
@@ -185,7 +177,7 @@ int main(int argc, char **argv) {
             pthread_mutex_unlock(&ptr->lock);
             ptr = ptr->prox;
         }
-
+    
     }
 
     s_no *ultimo = (s_no *)malloc(sizeof(s_no));
@@ -195,6 +187,7 @@ int main(int argc, char **argv) {
     ptlista1_fim->prox = ultimo;
     ptlista1_fim = ultimo;
     fclose(arq);
+
 
     for (int i = 0; i < 2; i++) {
         pthread_join(tid[i], NULL);
