@@ -1,4 +1,4 @@
-//Trabalho Incompleto
+//Trabalho Incompleto -> Faltou o -seq porém os que estão implementados não funcionam em alguns casos
 
 #include <stdio.h>
 #include <stdlib.h>
