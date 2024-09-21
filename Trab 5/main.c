@@ -1,4 +1,5 @@
-//Trabalho incompleto
+//Trabalho incompleto -> não implementei a parte da remoção dos primos e o código apresenta comportamento indefinido
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -349,8 +350,10 @@ int main(int argc, char **argv) {
     fclose(arq);
 
 
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 2; i++) {
         pthread_join(tid[i], NULL);
+    }
+        
     
     
     desalocarLista(ptlista1);
