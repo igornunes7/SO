@@ -1,3 +1,5 @@
+//Trabalho incompleto -> Faltou implementar os nomes dos filhos
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
