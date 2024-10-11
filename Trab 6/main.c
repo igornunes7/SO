@@ -18,7 +18,8 @@ int countAccesses(FILE *arq) {
     return count;
 }
 
-//auxiliar para troca
+
+//(LRU) auxiliar para troca
 void swap (int memory[], int ant, int prox){
     int temp = memory[ant];
 
@@ -28,7 +29,7 @@ void swap (int memory[], int ant, int prox){
 }
 
 
-//(LRU) move o elemento na posição index para o final da lista
+//(LRU) move o elemento na posição index para o final da lista (mais recentemente usado)
 void moveToLast(int index, int memory[], int size)
 {
     for (int i = index; i <= size - 2; i++) {
@@ -172,14 +173,13 @@ int LRU(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr,
                 fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
 
             //memoria cheia (substituição de pag)
-            } else {
-                //posição 0 = pagina menos recentemente usada
+            } else { 
                 memoria_lru[0] = acessos[j] / tam_pagina; 
                 erro_lru++;
                 fprintf(fptr,"erro de pagina endereço :%d pagina: %d\n", acessos[j], acessos[j] / tam_pagina);
             }
         } else {
-            //atualiza pagina mais recentemente usada para o final
+            //atualiza pagina menos usada
             moveToLast(usado, memoria_lru, n);
         }
     }
