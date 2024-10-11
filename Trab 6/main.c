@@ -172,13 +172,14 @@ int LRU(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr,
                 fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
 
             //memoria cheia (substituição de pag)
-            } else { 
+            } else {
+                //posição 0 = pagina menos recentemente usada
                 memoria_lru[0] = acessos[j] / tam_pagina; 
                 erro_lru++;
                 fprintf(fptr,"erro de pagina endereço :%d pagina: %d\n", acessos[j], acessos[j] / tam_pagina);
             }
         } else {
-            //atualiza pagina menos usada
+            //atualiza pagina mais recentemente usada para o final
             moveToLast(usado, memoria_lru, n);
         }
     }
