@@ -1,4 +1,6 @@
 tam da pagina = 10
 tam da memoria = varia de 30 a 39
 
+
+Use:
 ./t6 10 37 seq-20-paginas-10.txt
