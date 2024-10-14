@@ -68,7 +68,6 @@ int FIFO(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr
             //se há espaço na memoria
             if (n < qtd_pag) { 
                 memoria_fifo[n] = acessos[j] / tam_pagina; 
-                erro_fifo++;
                 n++;
                 fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
 
@@ -81,9 +80,11 @@ int FIFO(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr
                 if (primero == n) {
                     primero = 0; 
                 }
-                erro_fifo++;
+
                 fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
             }
+            erro_fifo++;
+
         } else {
            
         }
@@ -94,7 +95,7 @@ int FIFO(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr
 
 
 int OPT(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr, int tam) {
-    int memoria_opt[tam];     
+    int memoria_opt[tam];      
     int n = 0;              
     int erro_opt = 0;     
     int menor;
@@ -107,13 +108,13 @@ int OPT(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr,
     for (int j = 0; j < num_acessos; j++) {
         //a pagina nao está na memoria (erro de pagina)
         if (verify(acessos[j] / tam_pagina, memoria_opt, n) == -1) {
-
+            
             //se há espaço na memoria
             if (n < qtd_pag) { 
                 memoria_opt[n] = acessos[j] / tam_pagina; 
-                erro_opt++;
                 n++;
                 fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
+        
 
             //memoria cheia (substituição de pag)
             } else { 
@@ -131,20 +132,20 @@ int OPT(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr,
                     //assumindo que a pag a ser substituida é a atual
                     if (k == 0) {
                         menorcount = count;
-                    } else {
-                        if (count < menorcount) {
-                            //atualizar indice da pagina menos usada
-                            menor = k; 
-                        }
+                    } else if (count < menorcount){
+                        //atualizar indice da pagina menos usada
+                        menorcount = count;
+                        menor = k;
                     }
                 }
-                erro_opt++;
                 memoria_opt[menor] = acessos[j]/tam_pagina;
                 fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
             }
+            erro_opt++;
         } else {
            
         }
+
     }
 
     return erro_opt;
@@ -152,7 +153,7 @@ int OPT(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr,
 
 
 int LRU(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr, int tam) {
-    int memoria_lru[tam];        
+    int memoria_lru[tam];     
     int n = 0;              
     int erro_lru = 0; 
     int usado;    
@@ -168,16 +169,16 @@ int LRU(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr,
             //se há espaço na memoria
             if (n < qtd_pag) { 
                 memoria_lru[n] = acessos[j] / tam_pagina; 
-                erro_lru++;
                 n++;
                 fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
 
             //memoria cheia (substituição de pag)
             } else { 
                 memoria_lru[0] = acessos[j] / tam_pagina; 
-                erro_lru++;
                 fprintf(fptr,"erro de pagina endereço :%d pagina: %d\n", acessos[j], acessos[j] / tam_pagina);
             }
+            erro_lru++;
+            
         } else {
             //atualiza pagina menos usada
             moveToLast(usado, memoria_lru, n);
