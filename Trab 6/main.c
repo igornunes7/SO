@@ -20,7 +20,7 @@ int countAccesses(FILE *arq) {
 
 
 //(LRU) auxiliar para troca
-void swap (int memory[], int ant, int prox){
+void swap (int memory[], int ant, int prox) {
     int temp = memory[ant];
 
     memory[ant] = memory[prox];
@@ -30,8 +30,7 @@ void swap (int memory[], int ant, int prox){
 
 
 //(LRU) move o elemento na posição index para o final da lista (mais recentemente usado)
-void moveToLast(int index, int memory[], int size)
-{
+void moveToLast(int index, int memory[], int size) {
     for (int i = index; i <= size - 2; i++) {
         swap(memory, i, i + 1);
     }
@@ -39,8 +38,7 @@ void moveToLast(int index, int memory[], int size)
 
 
 //verifica se a página já está carregada na memória
-int verify(int num, int memory[], int size)
-{
+int verify(int num, int memory[], int size) {
     for (int i = 0; i < size; i++) {
         if (memory[i] == num) {
             return i;
@@ -198,6 +196,7 @@ int LRU(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr,
 
     return erro_lru;
 }
+
 
 int main(int argc, char *argv[]) {
     if (argc != 4) {
