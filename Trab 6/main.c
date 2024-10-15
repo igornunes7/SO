@@ -145,9 +145,7 @@ int FIFO(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr
         if (verify(acessos[j] / tam_pagina, memoria_fifo, n) == -1) {
             pageFaultFIFO (acessos, &n, memoria_fifo, j, qtd_pag, fptr, tam_pagina, num_acessos, &primeiro);
             erro_fifo++;
-        } else {
-           
-        }
+        }  
     }
 
     return erro_fifo;
@@ -168,9 +166,7 @@ int OPT(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr,
         if (verify(acessos[j] / tam_pagina, memoria_opt, n) == -1) {
             pageFaultOPT (acessos, &n, memoria_opt, j, qtd_pag, fptr, tam_pagina, num_acessos); 
             erro_opt++;
-        } else {
-
-        }
+        } 
     }
 
     return erro_opt;
