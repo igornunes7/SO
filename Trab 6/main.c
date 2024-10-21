@@ -81,7 +81,7 @@ void pageFaultOPT(int acessos[], int *n, int memoria[], int j, int qtd_pag, FILE
 
     //memoria livre
     if (*n < qtd_pag) {
-        memoria[*n] = acessos[j] / tam_pagina;  // Armazena a página na memória
+        memoria[*n] = acessos[j] / tam_pagina; 
         (*n)++;
         fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
 
@@ -117,7 +117,8 @@ void pageFaultLRU(int acessos[], int *n, int memoria[], unsigned *lastUsed, int 
     //se há espaço na memória
     if (*n < qtd_pag) {
         memoria[*n] = acessos[j] / tam_pagina; 
-        lastUsed[*n] = tempoAtual; // Atualiza o tempo da nova página
+        //atualiza o tempo da nova página
+        lastUsed[*n] = tempoAtual; 
         (*n)++;
         fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
     } 
@@ -137,7 +138,8 @@ void pageFaultLRU(int acessos[], int *n, int memoria[], unsigned *lastUsed, int 
         //substituir a página menos usada
         fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
         memoria[indiceSubstituir] = acessos[j] / tam_pagina; 
-        lastUsed[indiceSubstituir] = tempoAtual; //atualiza o tempo da nova página
+        //atualiza o tempo da nova página
+        lastUsed[indiceSubstituir] = tempoAtual; 
     }
 }
 
