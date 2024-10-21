@@ -72,57 +72,72 @@ void pageFaultFIFO(int acessos[], int *n, int memoria[], int j, int qtd_pag, FIL
 
 //(OPT) lida com o erro de pagina
 void pageFaultOPT(int acessos[], int *n, int memoria[], int j, int qtd_pag, FILE *fptr, int tam_pagina, int num_acessos) {
-    int menor = 0;
-    int menorcount = 0;
+    //indice da página que será substituída
+    int paginaAlvo = 0;
+
+    //indice que armazena a maior distância para o próximo uso
+    int maiorIndice = 0;  
     int count = 0;
 
-    //se há espaço na memoria
+    //memoria livre
     if (*n < qtd_pag) {
-        memoria[*n] = acessos[j] / tam_pagina; 
+        memoria[*n] = acessos[j] / tam_pagina;  // Armazena a página na memória
         (*n)++;
         fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
 
-    //memoria cheia (substituição de pag)
+    //substituição de página
     } else {
-        menor = 0;
-
-         //for auxiliar pra percorrer o arquivo todo
-        for (int k = 0; k < *n; k++) {
+        //encontrar qual será usada mais tarde para cada pagina
+        for (int k = 0; k < qtd_pag; k++) {
             count = 0;
-
-            //for que vai do endereço onde está ate o final
-            for (int i = j; i < num_acessos; i++) {
+            for (int i = j + 1; i < num_acessos; i++) {
                 if (memoria[k] == acessos[i] / tam_pagina) {
-                    count++;
+                    //encontrou a página sai do loop
+                    break;
                 }
+                //conta o número de acessos até encontrar a página
+                count++;  
             }
 
-             //assumindo que a pag a ser substituida é a atual
-            if (k == 0) {
-                menorcount = count;
-            } else if (count < menorcount) {
-                //atualizar indice da pagina menos usada
-                menorcount = count;
-                menor = k;
+            //se for a primeira página ou se a página tiver maior distância para o próximo uso
+            if (k == 0 || count > maiorIndice) {
+                maiorIndice = count;
+                paginaAlvo = k; 
             }
         }
-        memoria[menor] = acessos[j] / tam_pagina;
-        fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
+
+        memoria[paginaAlvo] = acessos[j] / tam_pagina;
+        fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], memoria[paginaAlvo]);
     }
 }
 
+
 //(LRU) lida com o erro de pagina
-void pageFaultLRU(int acessos[], int *n, int memoria[], int j, int qtd_pag, FILE *fptr, int tam_pagina, int num_acessos) {
-    //se há espaço na memoria
+void pageFaultLRU(int acessos[], int *n, int memoria[], unsigned *lastUsed, int j, int qtd_pag, FILE *fptr, int tam_pagina, unsigned tempoAtual) {
+    //se há espaço na memória
     if (*n < qtd_pag) {
         memoria[*n] = acessos[j] / tam_pagina; 
+        lastUsed[*n] = tempoAtual; // Atualiza o tempo da nova página
         (*n)++;
         fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
+    } 
+    //substituição de página
+    else {
+        unsigned indiceSubstituir = 0;
+        unsigned menorTempo = lastUsed[0];
 
-    //memoria cheia (substituição de pag)
-    } else {
-        memoria[0] = acessos[j] / tam_pagina; 
+        //encontrar a página com o menor tempo de uso
+        for (unsigned k = 1; k < qtd_pag; ++k) {
+            if (lastUsed[k] < menorTempo)  {
+                menorTempo = lastUsed[k];
+                indiceSubstituir = k;
+            }
+        }
+
+        //substituir a página menos usada
         fprintf(fptr, "Erro de página. Endereço: %d, Página: %d\n", acessos[j], acessos[j] / tam_pagina);
+        memoria[indiceSubstituir] = acessos[j] / tam_pagina; 
+        lastUsed[indiceSubstituir] = tempoAtual; //atualiza o tempo da nova página
     }
 }
 
@@ -151,51 +166,55 @@ int FIFO(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr
 
 
 int OPT(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr, int tam) {
-    int memoria_opt[tam];      
-    int n = 0;              
-    int erro_opt = 0;     
-
+    int memoria_opt[tam];  
+    int n = 0;            
+    int erro_opt = 0;      
 
     fprintf(fptr, "\nOPT:\n");
-
 
     for (int j = 0; j < num_acessos; j++) {
         //a pagina nao está na memoria (erro de pagina)
         if (verify(acessos[j] / tam_pagina, memoria_opt, n) == -1) {
-            pageFaultOPT (acessos, &n, memoria_opt, j, qtd_pag, fptr, tam_pagina, num_acessos); 
-            erro_opt++;
-        } 
+            pageFaultOPT(acessos, &n, memoria_opt, j, qtd_pag, fptr, tam_pagina, num_acessos);
+            erro_opt++;  
+        }
     }
 
     return erro_opt;
 }
 
 
-
-
-
 int LRU(int acessos[], int tam_pagina, int qtd_pag, int num_acessos, FILE *fptr, int tam) {
     int memoria_lru[tam];     
     int n = 0;              
     int erro_lru = 0; 
-    int usado;    
+    int usado;
+    unsigned tempoAtual = 0;
+    unsigned *lastUsed = malloc(qtd_pag * sizeof(unsigned));
 
+    for (unsigned i = 0; i < qtd_pag; ++i) {
+        lastUsed[i] = 0;        
+    }
 
     fprintf(fptr, "\nLRU:\n");
 
-
     for (int j = 0; j < num_acessos; j++) {
-        if((usado = verify(acessos[j]/tam_pagina, memoria_lru, n)) == -1) {
-            pageFaultLRU (acessos, &n, memoria_lru, j, qtd_pag, fptr, tam_pagina, num_acessos); 
+        //a pagina nao está na memoria (erro de pagina)
+        if((usado = verify(acessos[j] / tam_pagina, memoria_lru, n)) == -1) {
+            pageFaultLRU(acessos, &n, memoria_lru, lastUsed, j, qtd_pag, fptr, tam_pagina, tempoAtual);
             erro_lru++;
         } else {
-            //atualiza pagina menos usada
-            moveToLast(usado, memoria_lru, n);
+            //atualiza o tempo da página que foi acessada
+            lastUsed[usado] = tempoAtual;
         }
+
+        ++tempoAtual;
     }
 
+    free(lastUsed);
     return erro_lru;
 }
+
 
 
 int main(int argc, char *argv[]) {
